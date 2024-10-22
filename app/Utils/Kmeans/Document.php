@@ -26,13 +26,19 @@ class Document
     private $index;
 
     /**
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    private $model;
+
+    /**
      * Construct a new document instance from the given sentences
      *
      * @param string $sentences The sentences to construct the document from
      */
-    public function __construct(string $sentences)
+    public function __construct(string $sentences, $model = null)
     {
         $this->sentences = $sentences;
+        $this->model     = $model;
     }
 
     /**
@@ -46,7 +52,7 @@ class Document
         $this->uniqueWords = $uniqueWords;
 
         // Split the sentences into words
-        $words = explode(' ', trim(strtolower($this->sentences)));
+        $words = explode(' ', trim(strtolower($this->sanitizeSentences())));
 
         // Fill the array with the count of each word
         $values = array_fill(0, count($uniqueWords), 0);
@@ -70,6 +76,16 @@ class Document
     public function getUniqueWords()
     {
         return $this->uniqueWords;
+    }
+
+    /**
+     * Get the model associated with the document
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function getModel()
+    {
+        return $this->model;
     }
 
     /**
@@ -158,7 +174,7 @@ class Document
     {
         // Check if the word exists in the document
         if (!array_key_exists($word, $this->words)) {
-            throw new \InvalidArgumentException('The word does not exist in the document');
+            throw new \InvalidArgumentException("The word [{$word}] does not exist in the document");
         }
 
         // Return the value of the word
@@ -204,9 +220,29 @@ class Document
     public function getSentencesSplittedWords()
     {
         // Split the sentences into words
-        $words = explode(' ', trim(strtolower($this->sentences)));
+        $words = explode(' ', trim(strtolower($this->sanitizeSentences())));
 
         // Remove duplicate words
         return array_unique($words);
+    }
+
+    /**
+     * Sanitize the sentences by removing numbers and extra spaces
+     *
+     * This method removes numbers and extra spaces from the sentences
+     * and returns the sanitized sentences.
+     *
+     * @return string
+     */
+    private function sanitizeSentences()
+    {
+        // Remove numbers from the sentences
+        $words = preg_replace('/\d+/u', '', $this->sentences);
+
+        // Remove extra spaces from the sentences
+        $words = preg_replace('/\s+/', ' ', $words);
+
+        // Remove the ".pdf" string from the sentences
+        return preg_replace('/\.pdf/', ' ', $words);
     }
 }

@@ -32,10 +32,10 @@ class Kmeans
     /**
      * Initialize the K-Means clustering
      *
-     * @param array $documents
+     * @param array|\Illuminate\Support\Collection $documents
      * @param int $k
      */
-    public function __construct(array $documents, int $k = 2)
+    public function __construct($documents, int $k = 2)
     {
         if ($k <= 0) {
             throw new \InvalidArgumentException('K must be greater than 0');
@@ -56,7 +56,7 @@ class Kmeans
         $this->clusters = array_fill(0, $this->k, []);
 
         // Initialize the centroids with random documents
-        $this->centroids = Centroid::createCentroid($this->documents);
+        $this->centroids = Centroid::createCentroid($this->documents, $k);
     }
 
     /**
@@ -129,6 +129,18 @@ class Kmeans
     }
 
     /**
+     * Get the documents that are being clustered
+     *
+     * This method returns the collection of documents that are being clustered.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getDocuments()
+    {
+        return $this->documents;
+    }
+
+    /**
      * Get the clusters of documents
      *
      * This method returns a collection of arrays, with each array
@@ -138,7 +150,7 @@ class Kmeans
      */
     public function getClusters()
     {
-        return $this->clusters;
+        return collect($this->clusters);
     }
 
     /**
