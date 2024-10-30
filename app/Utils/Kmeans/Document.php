@@ -31,6 +31,13 @@ class Document
     private $model;
 
     /**
+     * Custom weights for each word
+     *
+     * @var array
+     */
+    private $customWeights = [];
+
+    /**
      * Construct a new document instance from the given sentences
      *
      * @param string $sentences The sentences to construct the document from
@@ -66,6 +73,30 @@ class Document
 
         // Store the array of words and its occurrence in the document
         $this->words = $array;
+
+        // set custom weights
+        if (count($this->customWeights) > 0) {
+
+            foreach ($words as $word) {
+                if (array_key_exists($word, $this->customWeights)) {
+                    $this->words[$word] = $this->customWeights[$word];
+                }
+            }
+        }
+    }
+
+    /**
+     * Set the custom weights for the document
+     *
+     * This method sets the custom weights for the document. The custom weights
+     * are used to calculate the value of each word in the document.
+     *
+     * @param array $weights The custom weights for each word in the document
+     * @return void
+     */
+    public function setCustomWeights($weights)
+    {
+        $this->customWeights = $weights;
     }
 
     /**
@@ -120,6 +151,24 @@ class Document
      */
     public function nearestCentroid($centroids)
     {
+        $distances = $this->getDistances($centroids);
+
+        // Sort the distances and get the index of the nearest centroid
+        $index = $distances->sort()->keys()->first();
+
+        // Return the nearest centroid
+        return $centroids->get($index);
+    }
+
+    /**
+     * Calculate the Euclidean distance of the document to each centroid
+     * and return a collection of the distances.
+     *
+     * @param \Illuminate\Support\Collection<Document> $centroids
+     * @return \Illuminate\Support\Collection
+     */
+    public function getDistances($centroids)
+    {
         if ($centroids->isEmpty()) {
             throw new \InvalidArgumentException('Centroids cannot be empty');
         }
@@ -136,11 +185,7 @@ class Document
             $distances->push($this->distance($centroid));
         }
 
-        // Sort the distances and get the index of the nearest centroid
-        $index = $distances->sort()->keys()->first();
-
-        // Return the nearest centroid
-        return $centroids->get($index);
+        return $distances;
     }
 
     /**
@@ -227,6 +272,21 @@ class Document
     }
 
     /**
+     * Set the words and their counts in the document
+     *
+     * This method sets the words and their counts in the document
+     * to the given words.
+     *
+     * @param array $words The words and their counts in the document
+     *
+     * @return void
+     */
+    public function setWords($words)
+    {
+        $this->words = $words;
+    }
+
+    /**
      * Sanitize the sentences by removing numbers and extra spaces
      *
      * This method removes numbers and extra spaces from the sentences
@@ -234,7 +294,7 @@ class Document
      *
      * @return string
      */
-    private function sanitizeSentences()
+    public function sanitizeSentences()
     {
         // Remove numbers from the sentences
         $words = preg_replace('/\d+/u', '', $this->sentences);

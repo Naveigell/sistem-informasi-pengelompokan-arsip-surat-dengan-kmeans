@@ -168,4 +168,18 @@ class Kmeans
             return clone $centroid;
         });
     }
+
+    /**
+     * Set the centroids of the clusters
+     *
+     * This method sets the centroids of the clusters to the given centroids.
+     *
+     * @param \Illuminate\Support\Collection|array $centroids The centroids to set
+     *
+     * @return void
+     */
+    public function setCentroids($centroids)
+    {
+        $this->centroids = collect($centroids);
+    }
 }

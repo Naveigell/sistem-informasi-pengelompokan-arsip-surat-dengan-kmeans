@@ -5,6 +5,22 @@ namespace App\Utils\Kmeans;
 
 class Centroid extends Document
 {
+    /**
+     * Create a new centroid with custom words
+     *
+     * This method creates a centroid by initializing a document with the provided words.
+     * It sets the words for the document and returns it as a centroid.
+     *
+     * @param array $words The words to set for the centroid
+     * @return static The created centroid with custom words
+     */
+    public static function createWithCustomWords($words)
+    {
+        $document = new static('', null);
+        $document->setWords($words);
+
+        return $document;
+    }
 
     /**
      * Create a centroid from a collection of documents

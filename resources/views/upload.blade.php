@@ -16,10 +16,11 @@
             <h4>Upload form</h4>
         </div>
         <div class="card-body">
-            <form>
+            <form method="post" action="{{ route('upload') }}" enctype="multipart/form-data">
+                @csrf
                 <div class="form-group">
                     <label for="file">File</label>
-                    <input type="file" class="form-control" id="file">
+                    <input type="file" class="form-control" id="file" name="file" accept="application/pdf">
                 </div>
                 <div class="form-group mt-3">
                     <button type="submit" class="btn btn-primary">Upload</button>
@@ -32,16 +33,16 @@
             <h4>Cluster</h4>
         </div>
         <div class="card-body">
-            <form method="post" action="{{ route('calculate') }}">
-                @csrf
-                <div class="form-group">
-                    <label for="k">Masukkan K :</label>
-                    <input type="number" class="form-control" id="k" name="k">
-                </div>
-                <div class="form-group mt-3">
-                    <button type="submit" class="btn btn-success">Kalkulasi</button>
-                </div>
-            </form>
+{{--            <form method="post" action="{{ route('calculate') }}">--}}
+{{--                @csrf--}}
+{{--                <div class="form-group">--}}
+{{--                    <label for="k">Masukkan K :</label>--}}
+{{--                    <input type="number" class="form-control" id="k" name="k">--}}
+{{--                </div>--}}
+{{--                <div class="form-group mt-3">--}}
+{{--                    <button type="submit" class="btn btn-success">Kalkulasi</button>--}}
+{{--                </div>--}}
+{{--            </form>--}}
 
             @foreach($clusters as $members)
                 <div class="card mt-4">
